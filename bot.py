@@ -8,7 +8,6 @@ import simplejson as json
 from hashlib import md5
 import asyncio
 
-
 class Watcher:
     '''Watches reddit submissions to see if they have been edited/updated'''
 
