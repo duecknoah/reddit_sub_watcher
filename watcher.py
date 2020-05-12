@@ -79,26 +79,40 @@ class Watcher:
                 await callback(updated_subs)
             await asyncio.sleep(freq)
 
+def get_watcher(bot_data=None, settings=None, reddit=None):
+    '''
+    :param bot_data: an object containing bot data
+    :param settings: an object containing settings (followed subs)
+    :param reddit: An instance of praw Reddit
+    :return: an instance of Watcher
+    '''
+    # reddit api login
+    if bot_data is None:
+        with open("bot_data.json") as f:
+            bot_data = json.load(f)
+
+    if settings is None:
+        with open("settings.json") as f:
+            settings = json.load(f)
+
+    if reddit is None:
+        return Watcher(
+            client_id=bot_data['client_id'],
+            client_secret=bot_data['client_secret'],
+            user_agent=bot_data['user_agent'],
+            subs=settings['followed_subs']
+        )
+    else:
+        return Watcher(
+            reddit=reddit,
+            subs=settings['followed_subs']
+        )
 
 async def test_method(subs: list):
     print('The following subs have updated: ', subs)
 
 if __name__ == '__main__':
-    # reddit api login
-    bot_data = {}
-    with open("bot_data.json") as f:
-        bot_data = json.load(f)
-
-    settings = {}
-    with open("settings.json") as f:
-        settings = json.load(f)
-
-    watcher = Watcher(
-        client_id=bot_data['client_id'],
-        client_secret=bot_data['client_secret'],
-        user_agent=bot_data['user_agent'],
-        subs=settings['followed_subs']
-    )
+    watcher = get_watcher()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     # Runs the following method every 5 minutes passing it the subs that
