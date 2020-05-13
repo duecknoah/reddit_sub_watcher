@@ -13,7 +13,7 @@ class Watcher:
 
     def __init__(self, **kwargs):
         '''
-        Usage: Watcher(client_id, client_secret, user_agent, subs=[])
+        Usage: Watcher(client_id, client_secret, username, password, user_agent, subs=[])
         Usage: Watcher(Praw.Reddit, subs=[])
         '''
         self.reddit = kwargs.get(
@@ -21,6 +21,8 @@ class Watcher:
             praw.Reddit(
                 client_id=kwargs.get('client_id'),
                 client_secret=kwargs.get('client_secret'),
+                username=kwargs.get('username'),
+                password=kwargs.get('password'),
                 user_agent=kwargs.get('user_agent')
             )
         )
@@ -99,6 +101,8 @@ def get_watcher(bot_data=None, settings=None, reddit=None):
         return Watcher(
             client_id=bot_data['client_id'],
             client_secret=bot_data['client_secret'],
+            username=bot_data['username'],
+            password=bot_data['password'],
             user_agent=bot_data['user_agent'],
             subs=settings['followed_subs']
         )

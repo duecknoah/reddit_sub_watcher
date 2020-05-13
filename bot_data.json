@@ -1,5 +1,7 @@
 {
   "client_id": "CLIENT_ID_HERE",
   "client_secret": "CLIENT_SECRET_HERE",
+  "username": "USERNAME_HERE",
+  "password": "PASSWORD_HERE",
   "user_agent": "USER_AGENT_HERE"
 }
