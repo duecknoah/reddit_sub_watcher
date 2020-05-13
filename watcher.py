@@ -35,7 +35,8 @@ class Watcher:
             sub, md5_hash = self.get_sub_and_hash(sub_id)
             self._watched_subs.append({
                 'id': sub_id,
-                'md5': md5_hash
+                'md5': md5_hash,
+                'selftext': sub.selftext,
             })
 
     def is_watching_sub(self, sub_id):
@@ -65,8 +66,12 @@ class Watcher:
             sub, new_hash = self.get_sub_and_hash(s['id'])
 
             if new_hash != s['md5']:
-                updated_subs.append(sub)
+                updated_subs.append({
+                    'sub': sub,
+                    'orgtext': s['selftext']
+                })
                 s['md5'] = new_hash
+                s['selftext'] = sub.selftext
         return updated_subs
 
     async def watch(self, callback, freq=300):
@@ -114,6 +119,8 @@ def get_watcher(bot_data=None, settings=None, reddit=None):
 
 async def test_method(subs: list):
     print('The following subs have updated: ', subs)
+    print('orgtext: ', subs[0]['orgtext'])
+    print('newtext: ', subs[0]['sub'].selftext)
 
 if __name__ == '__main__':
     watcher = get_watcher()
