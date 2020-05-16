@@ -1,4 +1,6 @@
 import difflib
+import re
+
 
 class SubHandler:
     """
@@ -30,20 +32,22 @@ class SubHandler:
 
     @staticmethod
     def get_diff(before, after):
-        before = before.split('\n')
-        after = after.split('\n')
+        before = re.split('(\n)', before)
+        after = re.split('(\n)', after)
         diffstring = ""
 
         for line in difflib.context_diff(before, after):
             diffstring += line
         return diffstring
 
-    def update_sub_data(self, sub_id, md5, body):
+    def update_sub_data(self, sub_id, md5, body, subreddit_name, submission_name, permalink):
         """
         Updates sub md5 hash and selftext
         :param sub_id: the id of the submission
         :param md5: the md5 hash of the sub selftext
         :param body: the raw string of the sub selftext
+        :param subreddit_name: the fullname string of the subreddit
+        :param submission_name: the fullname string of the submission
         :return: True if changed, None otherwise
         """
         if md5 != self._subs[sub_id]['md5']:
@@ -52,6 +56,9 @@ class SubHandler:
             self._subs[sub_id]['md5'] = md5
             self._subs[sub_id]['body_diff'] = SubHandler.get_diff(self._subs[sub_id]['body'], body)
             self._subs[sub_id]['body'] = body
+            self._subs[sub_id]['subreddit'] = subreddit_name
+            self._subs[sub_id]['submission'] = submission_name
+            self._subs[sub_id]['permalink'] = permalink
 
             # First time setting values, don't count as update
             if not is_initialized:

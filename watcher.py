@@ -9,6 +9,7 @@ from hashlib import md5
 import asyncio
 from sub_handler import SubHandler
 
+
 class Watcher:
     """Watches reddit submissions to see if they have been edited/updated"""
 
@@ -28,26 +29,6 @@ class Watcher:
             )
         )
         self.sub_handler = kwargs.get('subhandler', SubHandler())
-
-    # def watch_sub(self, sub_id):
-    #     if not self.is_watching_sub(sub_id):
-    #         sub, md5_hash = self.get_sub_and_hash(sub_id)
-    #         self._watched_subs.append({
-    #             'id': sub_id,
-    #             'md5': md5_hash,
-    #             'selftext': sub.selftext,
-    #         })
-    #
-    # def is_watching_sub(self, sub_id):
-    #     for s in self._watched_subs:
-    #         if s['id'] == sub_id:
-    #             return True
-    #     return False
-    #
-    # def remove_sub(self, sub_id):
-    #     for index, s in enumerate(self._watched_subs):
-    #         if s['id'] == sub_id:
-    #             del(self.watch_subs[index])
 
     def get_sub_and_hash(self, sub_id):
         reddit_sub = self.reddit.submission(sub_id)
@@ -74,6 +55,7 @@ class Watcher:
                     self.sub_handler.follow_sub(message.author.name, message.submission.id)
                 elif action == 'unwatch':
                     self.sub_handler.unfollow_sub(message.author.name, message.submission.id)
+                message.mark_read()
 
 
     async def check_subs(self):
@@ -84,21 +66,23 @@ class Watcher:
         updated_subs = []
         for sid in self.sub_handler.get_sub_ids():
             sub, new_hash = self.get_sub_and_hash(sid)
-            if self.sub_handler.update_sub_data(sid, new_hash, sub.selftext):
+            if self.sub_handler.update_sub_data(sid, new_hash, sub.selftext, sub.subreddit.display_name, sub.title, sub.permalink):
                 updated_subs.append(sid)
 
         return updated_subs
 
-    async def _notify_followers(self, sub_ids):
+    async def notify_followers(self, sub_ids):
         """
         Notifies the followed users of what was changed about the sub ids
         """
         print('notifying about ', sub_ids)
         for sid in sub_ids:
             users = self.sub_handler.get_users_of(sid)
+            subdata = self.sub_handler.get_sub_data(sid)
+            subject = 'Watch update: Subreddit "{}" Submission "{} Updated!"'.format(subdata['subreddit'],
+                                                                                     subdata['submission'])
+            msg = '[**Visit post**]({})\n\n__Changes__:\n{}'.format(subdata['permalink'], subdata['body_diff'])
             for user in users:
-                msg = self.sub_handler.get_sub_data(sid)['body_diff']
-                subject = 'sub {} updated!'.format(sid)
                 self.reddit.redditor(user).message(subject, msg)
                 print('messaged: ', user, ' about ', sid)
 
@@ -110,7 +94,7 @@ class Watcher:
         what was changed
         :param freq:
         """
-        await self.watch(self._notify_followers, freq)
+        await self.watch(self.notify_followers, freq)
 
     async def watch(self, callback, freq=300):
         """
@@ -124,6 +108,7 @@ class Watcher:
             if len(updated_subs) > 0:
                 await callback(updated_subs)
             await asyncio.sleep(freq)
+
 
 def get_watcher(bot_data=None, settings=None, reddit=None):
     """
@@ -157,6 +142,7 @@ def get_watcher(bot_data=None, settings=None, reddit=None):
             reddit=reddit,
             subhandler=subhandler
         )
+
 
 async def test_method(subs: list):
     print('The following subs have updated: ', subs)
