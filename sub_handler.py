@@ -1,6 +1,7 @@
 import difflib
 import re
 import pickle
+import logging
 
 
 class SubHandler:
@@ -22,7 +23,7 @@ class SubHandler:
         })
         subkey['users'].add(user)
         self.save_data()
-        print('{} followed {}'.format(user, sub_id))
+        logging.info('{} followed {}'.format(user, sub_id))
 
     def unfollow_sub(self, user, sub_id):
         if sub_id in self._subs:
@@ -33,7 +34,7 @@ class SubHandler:
             if len(self._subs[sub_id]['users']) == 0:
                 self._subs.pop(sub_id)
             self.save_data()
-            print('{} unfollowed {}'.format(user, sub_id))
+            logging.info('{} unfollowed {}'.format(user, sub_id))
 
     @staticmethod
     def get_diff(before, after):
@@ -70,7 +71,6 @@ class SubHandler:
             if not is_initialized:
                 retVal = False
             else:
-                print('{} updated'.format(sub_id))
                 self.save_data()
                 retVal = True
         return retVal

@@ -8,6 +8,7 @@ import simplejson as json
 from hashlib import md5
 import asyncio
 from sub_handler import SubHandler
+import logging
 
 
 class Watcher:
@@ -75,7 +76,7 @@ class Watcher:
         """
         Notifies the followed users of what was changed about the sub ids
         """
-        print('notifying about ', sub_ids)
+        logging.info('notifying about {}'.format(sub_ids))
         for sid in sub_ids:
             users = self.sub_handler.get_users_of(sid)
             subdata = self.sub_handler.get_sub_data(sid)
@@ -84,7 +85,7 @@ class Watcher:
             msg = '[**Visit post**]({})\n\n__Changes__:\n{}'.format(subdata['permalink'], subdata['body_diff'])
             for user in users:
                 self.reddit.redditor(user).message(subject, msg)
-                print('messaged: ', user, ' about ', sid)
+            logging.info('notified users {} about sub id {}'.format(users, sid))
 
 
 
@@ -144,12 +145,13 @@ def get_watcher(bot_data=None, settings=None, reddit=None):
         )
 
 
-async def test_method(subs: list):
-    print('The following subs have updated: ', subs)
-    print('orgtext: ', subs[0]['orgtext'])
-    print('newtext: ', subs[0]['sub'].selftext)
-
 if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.INFO,
+        filename='info.log',
+        format="%(asctime)s;%(levelname)s;%(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
     watcher = get_watcher()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
