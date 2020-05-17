@@ -1,5 +1,6 @@
 import difflib
 import re
+import pickle
 
 
 class SubHandler:
@@ -7,17 +8,20 @@ class SubHandler:
     A wrapper class for the structure that contains subs, users, and other metadata
     """
 
-    def __init__(self):
+    def __init__(self, do_load=True):
         self._subs = dict()
+        if do_load:
+            self.load_data()
 
     def follow_sub(self, user, sub_id):
         subkey = self._subs.setdefault(sub_id, {
             'users': set(),
             'md5': None,
-            'body': 'this is temporary\nand yea thats about it\n',
-            'bodydiff': None
+            'body': '',
+            'bodydiff': ''
         })
         subkey['users'].add(user)
+        self.save_data()
         print('{} followed {}'.format(user, sub_id))
 
     def unfollow_sub(self, user, sub_id):
@@ -28,6 +32,7 @@ class SubHandler:
             # it anymore
             if len(self._subs[sub_id]['users']) == 0:
                 self._subs.pop(sub_id)
+            self.save_data()
             print('{} unfollowed {}'.format(user, sub_id))
 
     @staticmethod
@@ -50,6 +55,7 @@ class SubHandler:
         :param submission_name: the fullname string of the submission
         :return: True if changed, None otherwise
         """
+        retVal = False
         if md5 != self._subs[sub_id]['md5']:
             is_initialized = self._subs[sub_id]['md5'] is not None
 
@@ -62,11 +68,12 @@ class SubHandler:
 
             # First time setting values, don't count as update
             if not is_initialized:
-                return False
-
-            print('{} updated'.format(sub_id))
-            return True
-        return False
+                retVal = False
+            else:
+                print('{} updated'.format(sub_id))
+                self.save_data()
+                retVal = True
+        return retVal
 
     def get_sub_data(self, sub_id):
         if sub_id in self._subs:
@@ -80,3 +87,16 @@ class SubHandler:
 
     def get_sub_ids(self):
         return self._subs.keys()
+
+    def save_data(self):
+        """ Saves sub handler data to subdata.pkl"""
+        with open("subdata.pkl", 'wb') as f:
+            pickle.dump(self._subs, f, pickle.HIGHEST_PROTOCOL)
+
+    def load_data(self):
+        """ Loads subh handler data from subdata.pkl if it exists"""
+        try:
+            with open("subdata.pkl", 'rb') as f:
+                self._subs = pickle.load(f)
+        except (IOError, FileNotFoundError, EOFError) as e:
+            pass
