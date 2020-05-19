@@ -111,7 +111,7 @@ class Watcher:
             await asyncio.sleep(freq)
 
 
-def get_watcher(bot_data=None, settings=None, reddit=None):
+def get_watcher(bot_data=None, reddit=None):
     """
     :param bot_data: an object containing bot data
     :param settings: an object containing settings (followed subs)
@@ -122,10 +122,6 @@ def get_watcher(bot_data=None, settings=None, reddit=None):
     if bot_data is None:
         with open("bot_data.json") as f:
             bot_data = json.load(f)
-
-    if settings is None:
-        with open("settings.json") as f:
-            settings = json.load(f)
 
     subhandler = SubHandler()
 
