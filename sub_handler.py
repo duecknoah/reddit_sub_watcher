@@ -56,7 +56,7 @@ class SubHandler:
         :param submission_name: the fullname string of the submission
         :return: True if changed, None otherwise
         """
-        retVal = False
+        ret_val = False
         if md5 != self._subs[sub_id]['md5']:
             is_initialized = self._subs[sub_id]['md5'] is not None
 
@@ -69,11 +69,11 @@ class SubHandler:
 
             # First time setting values, don't count as update
             if not is_initialized:
-                retVal = False
+                ret_val = False
             else:
                 self.save_data()
-                retVal = True
-        return retVal
+                ret_val = True
+        return ret_val
 
     def get_sub_data(self, sub_id):
         if sub_id in self._subs:

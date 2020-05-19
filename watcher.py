@@ -2,7 +2,6 @@
 # Compare previous post with current and look for difference
 # If there was an update notify the user
 
-# v2 - list of multiple posts
 import praw
 import simplejson as json
 from hashlib import md5
@@ -58,7 +57,6 @@ class Watcher:
                     self.sub_handler.unfollow_sub(message.author.name, message.submission.id)
                 message.mark_read()
 
-
     async def check_subs(self):
         """
         Checks if the followed subs have been edited
@@ -86,8 +84,6 @@ class Watcher:
             for user in users:
                 self.reddit.redditor(user).message(subject, msg)
             logging.info('notified users {} about sub id {}'.format(users, sid))
-
-
 
     async def default_watch(self, freq=300):
         """
@@ -153,4 +149,4 @@ if __name__ == '__main__':
     asyncio.set_event_loop(loop)
     # Runs the following method every 5 minutes passing it the subs that
     # have had their submission text updated
-    result = loop.run_until_complete(watcher.default_watch(5))
+    result = loop.run_until_complete(watcher.default_watch())
