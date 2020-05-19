@@ -1,7 +1,7 @@
 # reddit_sub_watcher
 Notifies you when an edit is made to reddit submissions
-- [Usage](##Usage)
-- [Setup](##Setup)
+- [Usage](#Usage)
+- [Setup](#Setup)
 
 ## Usage
 1. comment in the subreddit you want watched via `/u/BOT_NAME_HERE watch`<img src="https://user-images.githubusercontent.com/19723275/82376338-c8d9f600-99d6-11ea-92b8-f0c06ad428d3.png" alt="alt text" width="650" height="auto">
