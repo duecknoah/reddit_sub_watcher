@@ -91,6 +91,7 @@ class Watcher:
         what was changed
         :param freq:
         """
+        logging.info('Watcher started, checking every {} secs.'.format(freq))
         await self.watch(self.notify_followers, freq)
 
     async def watch(self, callback, freq=300):
